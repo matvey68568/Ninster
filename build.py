@@ -1,7 +1,11 @@
-"""Сборка Ninster в один .exe через PyInstaller.
+"""Сборка Ninster в один .exe через PyInstaller (с манифестом администратора).
 
 Запуск:  python build.py
 Результат:  dist/Ninster.exe
+
+Exe собирается с манифестом requireAdministrator, поэтому Windows сама
+запрашивает UAC ОДИН раз при запуске — и все программы ставятся без
+дополнительных запросов.
 """
 
 import subprocess
@@ -36,12 +40,18 @@ def main():
     subprocess.run(cmd, check=True)
 
     exe = ROOT / "dist" / f"{NAME}.exe"
-    if exe.exists():
-        size_mb = exe.stat().st_size / 1024 / 1024
-        print(f"\nГотово: {exe} ({size_mb:.1f} МБ)")
-    else:
+    if not exe.exists():
         print("\nОшибка: exe не собран", file=sys.stderr)
         sys.exit(1)
+
+    # Вшиваем requireAdministrator в готовый exe (PyInstaller --onefile
+    # не встраивает --manifest в финальный файл, поэтому патчим ресурс).
+    print("\nВшиваю манифест администратора…")
+    subprocess.run(
+        [sys.executable, str(ROOT / "patch_manifest.py"), str(exe)], check=True)
+
+    size_mb = exe.stat().st_size / 1024 / 1024
+    print(f"\nГотово: {exe} ({size_mb:.1f} МБ)")
 
 
 if __name__ == "__main__":

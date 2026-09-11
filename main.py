@@ -5,6 +5,7 @@
 
 import ctypes
 import queue
+import sys
 import tkinter as tk
 
 import customtkinter as ctk
@@ -14,7 +15,38 @@ from installer import Installer, Status, winget_available, get_winget_version
 
 APP_NAME = "Ninster"
 APP_TAGLINE = "Все нужные программы — в один клик"
-VERSION = "1.0.0"
+VERSION = "1.0.1"
+
+
+def is_admin() -> bool:
+    """True, если процесс запущен с правами администратора."""
+    try:
+        return ctypes.windll.shell32.IsUserAnAdmin() != 0
+    except Exception:
+        return False
+
+
+def elevate():
+    """Перезапускает процесс с правами администратора (UAC один раз при старте)."""
+    if sys.platform != "win32" or getattr(sys, "frozen", False) is False:
+        return
+    params = " ".join(sys.argv[1:])
+    try:
+        ctypes.windll.shell32.ShellExecuteW(
+            None, "runas", sys.executable, params, None, 1)
+    except Exception:
+        pass
+
+
+# ---------- Автоподнятие прав администратора ----------
+# UAC запрашивается ОДИН раз при запуске, а не при установке каждой программы.
+# Выполняется только при прямом запуске (не при импорте, напр. в smoke_test).
+
+def _ensure_admin():
+    if not is_admin():
+        elevate()
+        sys.exit(0)
+
 
 # ---------- DPI / тема ----------
 try:
@@ -125,10 +157,6 @@ class NinsterApp(ctk.CTk):
         self.log_btn.grid(row=1, column=1, sticky="e", padx=(8, 8))
 
         self.scope_var = tk.BooleanVar(value=False)
-        self.scope_cb = ctk.CTkCheckBox(
-            bottom, text="Без прав администратора (только текущий пользователь)",
-            variable=self.scope_var, font=FONT_SMALL)
-        self.scope_cb.grid(row=2, column=0, sticky="w", pady=(4, 4))
 
         self.install_btn = ctk.CTkButton(
             bottom, text="Установить", height=44, font=("Segoe UI Semibold", 15),
@@ -248,7 +276,7 @@ class NinsterApp(ctk.CTk):
 
         self.installer = Installer(
             selected,
-            per_user=self.scope_var.get(),
+            per_user=False,
             on_event=self._on_event,
             on_log=self._on_log,
             on_finish=self._on_finish,
@@ -320,7 +348,6 @@ class NinsterApp(ctk.CTk):
         self.clear_btn.configure(state=state)
         self.search_entry.configure(state=state)
         self.cat_menu.configure(state=state)
-        self.scope_cb.configure(state=state)
 
     # ---------- Журнал ----------
     def _toggle_log(self):
@@ -361,6 +388,7 @@ class NinsterApp(ctk.CTk):
 
 
 def main():
+    _ensure_admin()
     app = NinsterApp()
     app.mainloop()
 

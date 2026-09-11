@@ -131,6 +131,8 @@ CATALOG = [
     # ---------- Утилиты ----------
     App("Microsoft.PowerToys", "PowerToys", "utils", "Набор утилит для Windows"),
     App("voidtools.Everything", "Everything", "utils", "Мгновенный поиск файлов"),
+    App("AntibodySoftware.WizTree", "WizTree", "utils", "Анализ занятого места (очень быстрый)"),
+    App("Happ.Happ", "Happ", "utils", "Прокси-утилита"),
     App("Rufus.Rufus", "Rufus", "utils", "Создание загрузочных флешек"),
     App("CPUID.CPU-Z", "CPU-Z", "utils", "Информация о процессоре"),
     App("TechPowerUp.GPU-Z", "GPU-Z", "utils", "Информация о видеокарте"),
@@ -158,6 +160,7 @@ CATALOG = [
     App("Proton.ProtonMail", "Proton Mail", "security", "Защищённая почта"),
     App("Malwarebytes.Malwarebytes", "Malwarebytes", "security", "Антивирус и антишпион"),
     App("Tailscale.Tailscale", "Tailscale", "security", "Приватная mesh-сеть"),
+    App("Throneproj.Throne", "Throne", "security", "VPN/прокси-клиент (на базе sing-box)"),
 
     # ---------- Архиваторы ----------
     App("7zip.7zip", "7-Zip", "archivers", "Свободный архиватор"),
