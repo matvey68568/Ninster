@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Виртуальное окружение
+.venv/
+venv/
+
+# Артефакты сборки PyInstaller
+build/
+*.spec
+
+# Готовый exe — публикуется через GitHub Releases, не в репозиторий
+dist/
+
+# Служебные
+.DS_Store
+Thumbs.db
